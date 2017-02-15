@@ -498,6 +498,148 @@ selB.exit().remove()
 """
 
 # -----------------------------------------------
+slide.title title = "Scales"
+
+slide.code title, empty_svg, """
+// via A. Lex (dataviscourse.net)
+var data = [0.3, 0.01, 0.8];
+
+var svg = d3.select("div.output svg")
+svg.selectAll("rect")
+    .data(data)
+    .enter().append("rect")
+    .attr("x", 0)
+    .attr("y", function (d, i) { return i*90+50; })
+    .attr("width", function (d) { return d; })
+    .attr("height", 20)
+    .style("fill", "steelblue");
+"""
+
+slide.code title, empty_svg, """
+// via A. Lex (dataviscourse.net)
+var data = [0.3, 0.01, 0.8];
+
+// the scale function
+var s = function (input) {
+    return input * 500;
+}
+
+var svg = d3.select("div.output svg")
+svg.selectAll("rect")
+    .data(data)
+    .enter().append("rect")
+    .attr("x", 0)
+    .attr("y", function(d, i) { return i*90+50; })
+    .attr("width", function(d) { return s(d); })
+    .attr("height", 20)
+    .style("fill", "steelblue");
+
+"""
+
+slide.code title, empty_svg, """
+// via A. Lex (dataviscourse.net)
+var data = [0.3, 0.01, 0.8];
+
+// the scale function
+var xScale = d3.scaleLinear()
+// var xScale = d3.scaleLog() // check domain...
+    .domain([0,d3.max(data)])
+    .range([0,300]);
+
+var svg = d3.select("div.output svg")
+svg.selectAll("rect")
+    .data(data)
+    .enter().append("rect")
+    .attr("x", 0)
+    .attr("y", function(d, i) { return i*90+50; })
+    .attr("width", function(d) { return xScale(d); })
+    .attr("height", 20)
+    .style("fill", "steelblue");
+"""
+
+# -----------------------------------------------
+slide.title title = "Axes"
+
+slide.code title, empty_svg, """
+var data = [0.3, 0.01, 0.8];
+
+// the scale function
+var xScale = d3.scaleLinear()
+    .domain([0,d3.max(data)])
+    .range([0,300]);
+
+var xAxis = d3.axisBottom(); // axisTop()
+xAxis.scale(xScale);
+
+var svg = d3.select("div.output svg")
+svg.selectAll("rect")
+    .data(data)
+    .enter().append("rect")
+    .attr("x", 0)
+    .attr("y", function(d, i) { return i*90+50; })
+    .attr("width", function(d) { return xScale(d); })
+    .attr("height", 20)
+    .style("fill", "steelblue");
+
+svg.append("g").call(xAxis);
+
+"""
+
+slide.code title, empty_svg, """
+var data = [0.3, 0.01, 0.8];
+
+// the scale function
+var xScale = d3.scaleLinear()
+    .domain([0,d3.max(data)])
+    .range([0,300]);
+
+var xAxis = d3.axisBottom();
+xAxis.scale(xScale);
+
+var svg = d3.select("div.output svg")
+svg.selectAll("rect")
+    .data(data)
+    .enter().append("rect")
+    .attr("x", 0)
+    .attr("y", function(d, i) { return i*90+50; })
+    .attr("width", function(d) { return xScale(d); })
+    .attr("height", 20)
+    .style("fill", "steelblue");
+
+svg.append("g")
+    .attr("transform", "translate(0, 300)")
+    .call(xAxis);
+"""
+
+slide.code title, empty_svg, """
+var data = [0.3, 0.01, 0.8];
+
+// the scale function
+var xScale = d3.scaleLinear()
+    .domain([0,d3.max(data)])
+    .range([0,300]);
+
+var xAxis = d3.axisBottom();
+xAxis.scale(xScale);
+
+var svg = d3.select("div.output svg")
+svg.selectAll("rect")
+    .data(data)
+    .enter().append("rect")
+    .attr("x", 10)
+    .attr("y", function(d, i) { return i*90+50; })
+    .attr("width", function(d) { return xScale(d); })
+    .attr("height", 20)
+    .style("fill", "steelblue");
+
+svg.append("g")
+    .attr("transform", "translate(10, 300)")
+    .call(xAxis);
+
+"""
+
+
+# -----------------------------------------------
 slide.title "Useful Examples"
 
 slide.code "Shuffle", empty_svg, """
