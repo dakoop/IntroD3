@@ -255,6 +255,8 @@ selection.enter().append("rect")
   .style("fill", "steelblue")
 """
 
+title = ".merge()"
+
 slide.code title, rect3, """
 var svg = d3.select("div.output svg")
 
@@ -274,7 +276,24 @@ selection.enter().append("rect")
     .style("fill", "steelblue")
 """
 
-title += " // a common pattern"
+title = ".join()"
+
+slide.code title, rect3, """
+// Even shorter (v5.9)
+// Join does enter/append automatically
+var svg = d3.select("div.output svg");
+
+svg.selectAll("rect")
+    .data([127, 61, 256, 71])
+    .join("rect")
+      .attr("x", 0)
+      .attr("y", function(d,i) { return i*90+30 })
+      .attr("width", function(d,i) { return d; })
+      .attr("height", 20)
+      .style("fill", "steelblue");
+"""
+
+title = ".enter() // a common pattern"
 slide.code title, empty_svg, """
 var svg = d3.select("div.output svg")
 
@@ -323,6 +342,21 @@ selection.exit()
   .remove()
 """
 
+title = ".join()"
+
+slide.code title, rect3, """
+// .join removes exit part automatically
+var svg = d3.select("div.output svg");
+
+svg.selectAll("rect")
+    .data([127, 61])
+    .join("rect")
+      .attr("x", 0)
+      .attr("y", function(d,i) { return i*90+50 })
+      .attr("width", function(d,i) { return d; })
+      .attr("height", 20)
+      .style("fill", "steelblue");
+"""
 
 # -----------------------------------------------
 slide.code_title title = ".transition()"
@@ -376,6 +410,43 @@ selection.exit()
   .duration(3000)
     .attr("opacity", 0)
     .remove()
+"""
+
+slide.code title, rect3, """
+  var svg = d3.select("div.output svg");
+  const t = svg.transition()
+        .duration(3000);
+
+  function update_bars(s) {
+      s.transition(t)
+      .attr("x", 0)
+      .attr("y", function(d,i) { return i*90+50 })
+      .attr("width", function(d,i) { return d; })
+      .attr("height", 20)
+      .style("fill", "steelblue")
+      .transition()
+      .duration(3000)
+        .style("fill", "green")
+        .attr("width", function(d,i) {
+            return d*1.5;
+          });
+  }
+
+  var selection = svg.selectAll("rect")
+    .data([127, 61]) // add more [256, 71]
+    .join(enter => enter.append("rect")
+           .attr("x", 200)
+           .attr("y", 200)
+           .attr("width", 10)
+           .attr("height", 10)
+           .style("fill", "red")
+           .call(update_bars),
+         update => update.call(update_bars),
+         exit => exit.attr("opacity", 1)
+           .transition()
+           .duration(3000)
+           .attr("opacity", 0)
+           .remove());
 """
 
 # -----------------------------------------------
