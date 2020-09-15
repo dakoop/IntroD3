@@ -67,13 +67,17 @@ body {
   text-align: center;
 }
 section {
-  width: 1200px;
-  height: 800px;
+  width: 1440px;
+  /* 1200px;*/
+  height: 810px;
+  /* 800px; */
   position: absolute;
   top: 50%;
   left: 50%;
-  margin-left: -600px;
-  margin-top: -400px;
+  margin-left: -720px;
+  /* -600px; */
+  margin-top: -405px;
+  /* -400px; */
   border-radius: 8px;
   -o-border-radius: 8px;
   -moz-border-radius: 8px;
@@ -119,7 +123,8 @@ section.code_slide div.codes {
   position: absolute;
   left: 10px;
   bottom: 10px;
-  right: 605px;
+  right: 725px;
+  /* 600px + 5px; */
   top: 90px;
 }
 section.code_slide div.codes textarea {
@@ -150,7 +155,8 @@ section.code_slide div.out {
   position: absolute;
   right: 10px;
   bottom: 10px;
-  left: 605px;
+  left: 725px;
+  /* 600px + 5px; */
   top: 90px;
   border: 1px solid #ccc;
 }
@@ -218,3 +224,4 @@ section .mmx {
   margin-left: -150px;
   bottom: 3px;
 }
+/*# sourceMappingURL=deck.css.map */
