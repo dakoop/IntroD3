@@ -28,26 +28,28 @@
     update(0);
   }
 
-  d3.select('body').on('keydown', function() {
+  d3.select('body').on('keydown', function(event) {
+    console.log("GOT EVENT:", event, event.code);
     var newSlide;
-    switch (d3.event.keyCode) {
+    switch (event.keyCode) {
       case 40:
       case 34:
       case 39:
-        newSlide = d3.event.metaKey ? Infinity : slide + 1;
+        newSlide = event.metaKey ? Infinity : slide + 1;
         break;
       case 38:
       case 33:
       case 37:
-        newSlide = d3.event.metaKey ? 0 : slide - 1;
+        newSlide = event.metaKey ? 0 : slide - 1;
         break;
       case 32:
-        newSlide = d3.event.shiftKey ? slide - 1 : slide + 1;
+        newSlide = event.shiftKey ? slide - 1 : slide + 1;
         break;
       default:
+        console.log("GOT DEFAULT, RETURNING");
         return;
     }
     update(newSlide);
-    d3.event.preventDefault();
+    event.preventDefault();
   });
 })();

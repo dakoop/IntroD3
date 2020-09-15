@@ -39,7 +39,7 @@ rect3 = ->
 
 slide.title "First, some JavaScript"
 
-slide.code "JavaScript", null, """
+slide.code "Functions are objects", null, """
 // In JS functions are first class citizens.
 // This is a very powerful concept!
 function sq1(x) {
@@ -59,7 +59,7 @@ sq2.bar = 3
 console.log("Trippy:", sq1(sq1.foo + sq2.bar))
 """
 
-slide.code "JavaScript to the Max", null, """
+slide.code "Closures bake in state", null, """
 // Functions can be used to 'bake in' state
 
 var formatter = function(prefix, fixed) {
@@ -71,14 +71,17 @@ var formatter = function(prefix, fixed) {
 }
 
 var currency = formatter('$', 2)
-var roughly = formatter('~ ', 1)
+var roughly = formatter('~', 1)
+var roughlyDefault = formatter('~') // no 2nd param!
+var defaultFormat = formatter() // no params!
 
 console.log("currency(31/3) ==", currency(31/3))
-
 console.log("roughly(31/3) ==", roughly(31/3))
+console.log("roughlyDefault(31/3) ==", roughlyDefault(31/3))
+console.log("defaultFormat(31/3) ==", defaultFormat(31/3))
 """
 
-slide.code "JavaScript to the Max", null, """
+slide.code "Configurable functions", null, """
 // D3 has many helper methods
 // d3.scaleLinear() returns a function that
 // will map the given domain to the given
@@ -127,25 +130,6 @@ svg.select("rect")
   .style("fill", "steelblue")
 """
 
-slide.code title, rect1, """
-var svg = d3.select("div.output svg")
-
-// Object map style
-// NOT RECOMMENDED in D3 v4
-// IMPORTANT: this requires d3-selection-multi
-//   to be loaded as a separate plugin library;
-//   it is not part of the default bundle
-// https://d3js.org/d3-selection-multi.v1.min.js
-
-// D3 v4 change .attrs instead of .attr
-svg.select("rect")
-  .attrs({
-    width: 100,
-    height: 100
-  })
-  .style("fill", "steelblue")
-"""
-
 # -----------------------------------------------
 slide.code_title title = ".selectAll()"
 
@@ -168,6 +152,10 @@ svg.selectAll("rect")
 """
 
 slide.code title, rect3, """
+// Each D3 attr/style function passes two params:
+//   1. d: a data item
+//   2. i: the index of the data item
+
 var svg = d3.select("div.output svg")
 
 svg.selectAll("rect")
@@ -176,6 +164,22 @@ svg.selectAll("rect")
   .attr("width", function(d,i) {
       return i*150+100;
     })
+  .attr("height", 20)
+  .style("fill", "steelblue")
+"""
+
+slide.code "Arrow Functions", rect3, """
+// Two ways to write anonymous functions
+//   1. function(d,i) { return i*90+50; }
+//   2. (d,i) => i*90+50
+// Arrow functions are more succinct
+
+var svg = d3.select("div.output svg")
+
+svg.selectAll("rect")
+  .attr("x", 0)
+  .attr("y", (d,i) => i*90+50)
+  .attr("width", (d,i) => i*150+100)
   .attr("height", 20)
   .style("fill", "steelblue")
 """
@@ -190,8 +194,8 @@ var svg = d3.select("div.output svg")
 svg.selectAll("rect")
   .data([127, 61, 256])
   .attr("x", 0)
-  .attr("y", function(d,i) { return i*90+50 })
-  .attr("width", function(d,i) { return d; })
+  .attr("y", (d,i) => i*90+50)
+  .attr("width", (d,i) => d) // or d => d
   .attr("height", 20)
   .style("fill", "steelblue")
 """
@@ -207,8 +211,8 @@ var selection = svg.selectAll("rect")
 
 selection
   .attr("x", 0)
-  .attr("y", function(d,i) { return i*90+50 })
-  .attr("width", function(d,i) { return d; })
+  .attr("y", (d,i) => i*90+50)
+  .attr("width", d => d)
   .attr("height", 20)
   .style("fill", "steelblue")
 """
@@ -221,8 +225,8 @@ var selection = svg.selectAll("rect")
 
 selection
   .attr("x", 0)
-  .attr("y", function(d,i) { return i*90+50 })
-  .attr("width", function(d,i) { return d; })
+  .attr("y", (d,i) => i*90+50)
+  .attr("width", d => d)
   .attr("height", 20)
   .style("fill", "steelblue")
 
@@ -240,17 +244,19 @@ var svg = d3.select("div.output svg")
 var selection = svg.selectAll("rect")
   .data([127, 61, 256, 71])
 
+// update existing items
 selection
   .attr("x", 0)
-  .attr("y", function(d,i) { return i*90+50 })
-  .attr("width", function(d,i) { return d; })
+  .attr("y", (d,i) => i*90+50)
+  .attr("width", d => d)
   .attr("height", 20)
   .style("fill", "steelblue")
 
+// add (enter) new
 selection.enter().append("rect")
   .attr("x", 0)
-  .attr("y", function(d,i) { return i*90+50 })
-  .attr("width", function(d,i) { return d; })
+  .attr("y", (d,i) => i*90+50)
+  .attr("width", d => d)
   .attr("height", 20)
   .style("fill", "steelblue")
 """
@@ -264,14 +270,13 @@ var selection = svg.selectAll("rect")
   .data([127, 61, 256, 71])
 
 // Shorter
-// D3 v4 change: in v3, selections
-// were mutable and enter changed selection
-// now, merge makes this explicit
+// Merge merges the enter selection
+// with the update selection
 selection.enter().append("rect")
   .merge(selection)
     .attr("x", 0)
-    .attr("y", function(d,i) { return i*90+50 })
-    .attr("width", function(d,i) { return d; })
+    .attr("y", (d,i) => i*90+50)
+    .attr("width", d => d)
     .attr("height", 20)
     .style("fill", "steelblue")
 """
@@ -279,18 +284,17 @@ selection.enter().append("rect")
 title = ".join()"
 
 slide.code title, rect3, """
-// Even shorter (v5.9)
 // Join does enter/append automatically
+
 var svg = d3.select("div.output svg");
 
 svg.selectAll("rect")
-    .data([127, 61, 256, 71])
-    .join("rect")
-      .attr("x", 0)
-      .attr("y", function(d,i) { return i*90+30 })
-      .attr("width", function(d,i) { return d; })
-      .attr("height", 20)
-      .style("fill", "steelblue");
+    .data([127, 61, 256, 71]).join("rect")
+    .attr("x", 0)
+    .attr("y", (d,i) => i*90+50)
+    .attr("width", d => d)
+    .attr("height", 20)
+    .style("fill", "steelblue");
 """
 
 title = ".enter() // a common pattern"
@@ -301,8 +305,22 @@ svg.selectAll("rect")
   .data([127, 61, 256])
   .enter().append("rect")
     .attr("x", 0)
-    .attr("y", function(d,i) { return i*90+50 })
-    .attr("width", function(d,i) { return d; })
+    .attr("y", (d,i) => i*90+50)
+    .attr("width", d => d)
+    .attr("height", 20)
+    .style("fill", "steelblue")
+"""
+
+title = ".enter() // using join"
+slide.code title, empty_svg, """
+var svg = d3.select("div.output svg")
+
+svg.selectAll("rect")
+  .data([127, 61, 256])
+  .join("rect")
+    .attr("x", 0)
+    .attr("y", (d,i) => i*90+50)
+    .attr("width", d => d)
     .attr("height", 20)
     .style("fill", "steelblue")
 """
@@ -319,8 +337,8 @@ var selection = svg.selectAll("rect")
 
 selection
   .attr("x", 0)
-  .attr("y", function(d,i) { return i*90+50 })
-  .attr("width", function(d,i) { return d; })
+  .attr("y", (d,i) => i*90+50)
+  .attr("width", d => d)
   .attr("height", 20)
   .style("fill", "steelblue")
 """
@@ -333,8 +351,8 @@ var selection = svg.selectAll("rect")
 
 selection
   .attr("x", 0)
-  .attr("y", function(d,i) { return i*90+50 })
-  .attr("width", function(d,i) { return d; })
+  .attr("y", (d,i) => i*90+50)
+  .attr("width", d => d)
   .attr("height", 20)
   .style("fill", "steelblue")
 
@@ -349,13 +367,12 @@ slide.code title, rect3, """
 var svg = d3.select("div.output svg");
 
 svg.selectAll("rect")
-    .data([127, 61])
-    .join("rect")
-      .attr("x", 0)
-      .attr("y", function(d,i) { return i*90+50 })
-      .attr("width", function(d,i) { return d; })
-      .attr("height", 20)
-      .style("fill", "steelblue");
+    .data([127, 61]).join("rect")
+    .attr("x", 0)
+    .attr("y", (d,i) => i*90+50)
+    .attr("width", d => d)
+    .attr("height", 20)
+    .style("fill", "steelblue");
 """
 
 # -----------------------------------------------
@@ -369,8 +386,8 @@ svg.selectAll("rect")
   .transition()
   .duration(3000) // 3 seconds
     .attr("x", 0)
-    .attr("y", function(d,i) { return i*90+50 })
-    .attr("width", function(d,i) { return d; })
+    .attr("y", (d,i) => i*90+50)
+    .attr("width", d => d)
     .attr("height", 20)
     .style("fill", "steelblue")
 """
@@ -391,18 +408,15 @@ selection.enter().append("rect")
     .transition()
     .duration(3000)
       .attr("x", 0)
-      .attr("y", function(d,i) { return i*90+50 })
-      .attr("width", function(d,i) { return d; })
+      .attr("y", (d,i) => i*90+50)
+      .attr("width", d => d)
       .attr("height", 20)
       .style("fill", "steelblue")
       .transition()
-      // D3 v4 change: delays relative
-      //  to previous transition (none needed)
+      // delays relative to previous transition
       .duration(3000)
         .style("fill", "green")
-        .attr("width", function(d,i) {
-            return d*1.5;
-          })
+        .attr("width", d => d*1.5)
 
 selection.exit()
   .attr("opacity", 1)
@@ -420,16 +434,14 @@ slide.code title, rect3, """
   function update_bars(s) {
       s.transition(t)
       .attr("x", 0)
-      .attr("y", function(d,i) { return i*90+50 })
-      .attr("width", function(d,i) { return d; })
+      .attr("y", (d,i) => i*90+50)
+      .attr("width", d => d)
       .attr("height", 20)
       .style("fill", "steelblue")
       .transition()
       .duration(3000)
         .style("fill", "green")
-        .attr("width", function(d,i) {
-            return d*1.5;
-          });
+        .attr("width", d => d*1.5)
   }
 
   var selection = svg.selectAll("rect")
@@ -473,8 +485,8 @@ svg.selectAll("rect")
   .data([127, 61, 256])
   .enter().append("rect")
     .attr("x", 0)
-    .attr("y", function(d,i) { return i*90+50 })
-    .attr("width", function(d,i) { return d; })
+    .attr("y", (d,i) => i*90+50)
+    .attr("width", d => d)
     .attr("height", 20)
     .style("fill", "steelblue")
 */
@@ -485,16 +497,16 @@ var selection = svg.selectAll("rect")
 
 selection.enter().append("rect")
     .attr("x", 0)
-    .attr("y", function(d,i) { return i*90+50 })
-    .attr("width", function(d,i) { return d; })
+    .attr("y", (d,i) => i*90+50)
+    .attr("width", d => d)
     .attr("height", 20)
     .style("fill", "steelblue")
   .merge(selection)
     .transition()
     .duration(3000)
       .attr("x", 0)
-      .attr("y", function(d,i) { return i*90+50 })
-      .attr("width", function(d,i) { return d; })
+      .attr("y", (d,i) => i*90+50)
+      .attr("width", d => d)
       .attr("height", 20)
       .style("fill", "steelblue")
 
@@ -508,30 +520,26 @@ slide.code title, init_svg, """
 var svg = d3.select("div.output svg")
 
 var selection = svg.selectAll("rect")
-  .data([61, 256, 71], function(d) { return d; })
+  .data([61, 256, 71], d => d)
 
 selection.enter().append("rect")
     .attr("x", 0)
-    .attr("y", function(d,i) {
-        return (i+1)*90+50
-      })
-    .attr("width", function(d,i) { return d; })
+    .attr("y", (d,i) => (i+1)*90+50)
+    .attr("width", d => d)
     .attr("height", 20)
     .style("fill", "steelblue")
     .style("opacity", 0)
   .merge(selection)
     .transition()
     .duration(3000)
-      .attr("y", function(d,i) { return i*90+50 })
+      .attr("y", (d,i) => i*90+50)
       .attr("height", 20)
       .style("opacity", 1)
 
 selection.exit()
   .transition()
   .duration(3000)
-    .attr("y", function(d,i) {
-        return (i-1)*90+50
-      })
+    .attr("y", (d,i) => (i-1)*90+50)
     .style("opacity", 0)
     .remove()
 """
@@ -543,29 +551,26 @@ slide.code title, empty_svg, """
 var myData = [
   [15, 20],
   [40, 10],
-  [30, 17]
+  [30, 27]
 ]
 
 var svg = d3.select("div.output svg")
 
 // First selection (within svg)
-
-var selA = svg.selectAll("g").data(myData)
-var merged = selA.enter().append("g")
-  .merge(selA)
-    .attr("transform", function(d,i) {
-      return 'translate(70,' + (i*100+50) + ')' })
-selA.exit().remove()
+var selA = svg.selectAll("g")
+  .data(myData)
+  .join("g")
+  .attr("transform", (d, i) => `translate(70,${i*100+50})`)
+  // backticks (``) denote template literal
+  // normal strings except that text inside ${...}
+  // is evaluated (can be js expression)!
 
 // Second selection (within first selection)
-
-var selB = merged.selectAll('circle')
-  .data(function(d) { return d })
-selB.enter().append('circle')
-  .merge(selB)
-    .attr("cx", function(d,i) { return i*80 })
-    .attr("r", function(d,i) { return d })
-selB.exit().remove()
+var selB = selA.selectAll('circle')
+  .data(d => d)
+  .join("circle")
+  .attr("cx", (d, i) => i*80)
+  .attr("r", (d,i) => d)
 """
 
 # -----------------------------------------------
@@ -580,8 +585,8 @@ svg.selectAll("rect")
     .data(data)
     .enter().append("rect")
     .attr("x", 0)
-    .attr("y", function (d, i) { return i*90+50; })
-    .attr("width", function (d) { return d; })
+    .attr("y", (d,i) => i*90+50)
+    .attr("width", d => d)
     .attr("height", 20)
     .style("fill", "steelblue");
 """
@@ -600,8 +605,8 @@ svg.selectAll("rect")
     .data(data)
     .enter().append("rect")
     .attr("x", 0)
-    .attr("y", function(d, i) { return i*90+50; })
-    .attr("width", function(d) { return s(d); })
+    .attr("y", (d,i) => i*90+50)
+    .attr("width", d => s(d))
     .attr("height", 20)
     .style("fill", "steelblue");
 
@@ -622,8 +627,8 @@ svg.selectAll("rect")
     .data(data)
     .enter().append("rect")
     .attr("x", 0)
-    .attr("y", function(d, i) { return i*90+50; })
-    .attr("width", function(d) { return xScale(d); })
+    .attr("y", (d,i) => i*90+50)
+    .attr("width", d => xScale(d))
     .attr("height", 20)
     .style("fill", "steelblue");
 """
@@ -647,8 +652,8 @@ svg.selectAll("rect")
     .data(data)
     .enter().append("rect")
     .attr("x", 0)
-    .attr("y", function(d, i) { return i*90+50; })
-    .attr("width", function(d) { return xScale(d); })
+    .attr("y", (d,i) => i*90+50)
+    .attr("width", d => xScale(d))
     .attr("height", 20)
     .style("fill", "steelblue");
 
@@ -672,8 +677,8 @@ svg.selectAll("rect")
     .data(data)
     .enter().append("rect")
     .attr("x", 0)
-    .attr("y", function(d, i) { return i*90+50; })
-    .attr("width", function(d) { return xScale(d); })
+    .attr("y", (d,i) => i*90+50)
+    .attr("width", d => xScale(d))
     .attr("height", 20)
     .style("fill", "steelblue");
 
@@ -698,8 +703,8 @@ svg.selectAll("rect")
     .data(data)
     .enter().append("rect")
     .attr("x", 10)
-    .attr("y", function(d, i) { return i*90+50; })
-    .attr("width", function(d) { return xScale(d); })
+    .attr("y", (d,i) => i*90+50)
+    .attr("width", d => xScale(d))
     .attr("height", 20)
     .style("fill", "steelblue");
 
@@ -709,6 +714,36 @@ svg.append("g")
 
 """
 
+slide.code title, empty_svg, """
+var data = [0.3, 0.01, 0.8];
+
+// the scale function
+var xScale = d3.scaleLinear()
+  .domain([0,d3.max(data)])
+  .range([0,300]);
+
+var yScale = d3.scaleBand()
+  .domain([...data.keys()])
+  .range([0,300])
+  .padding(0.7)
+
+var xAxis = d3.axisBottom();
+xAxis.scale(xScale);
+
+var svg = d3.select("div.output svg")
+svg.selectAll("rect")
+  .data(data)
+  .enter().append("rect")
+  .attr("x", 10)
+  .attr("y", (d,i) => yScale(i))
+  .attr("width", d => xScale(d))
+  .attr("height", yScale.bandwidth())
+  .style("fill", "steelblue");
+
+svg.append("g")
+  .attr("transform", "translate(10, 300)")
+  .call(xAxis);
+"""
 
 # -----------------------------------------------
 slide.title "Useful Examples"
@@ -730,11 +765,11 @@ var selection = svg.selectAll("text")
 selection
   .transition()
   .duration(1000)
-    .attr("y", function(d,i) { return i*35+40 })
+    .attr("y", (d,i) => i*35+40)
 
 selection.enter().append("text")
   .attr("x", 30)
-  .attr("y", function(d,i) { return i*35+40 })
+  .attr("y", (d,i) => i*35+40)
   .style("fill", function(d) {
       return "\\u2665\\u2666".indexOf(d[1]) < 0 ?
         "black" : "red";
@@ -759,15 +794,15 @@ var selection = svg.selectAll("text")
 
 selection
   .transition().duration(500)
-  .attr("x", function(d,i) {return (i%8)*30+30})
+  .attr("x", (d,i) => (i%8)*30+30)
   .transition().duration(500)
-  .attr("y", function(d,i) { return i*35+40 })
+  .attr("y", (d,i) => i*35+40)
   .transition().duration(500)
   .attr("x", 30)
 
 selection.enter().append("text")
   .attr("x", 30)
-  .attr("y", function(d,i) { return i*35+40 })
+  .attr("y", (d,i) => i*35+40)
   .style("fill", function(d) {
       return "\\u2665\\u2666".indexOf(d[1]) < 0 ?
         "black" : "red";
@@ -797,12 +832,9 @@ var points = [
   { x: 400, y: 150 }
 ]
 
-// D3 v4 change: d3.line was d3.svg.line in v3
 var lineFn = d3.line()
-  .x(function(d) { return d.x })
-  .y(function(d) { return d.y })
-  // D3 v4 change: .curve(d3.curveCardinal) was
-  // .interpolate("cardinal") in v3
+  .x(d => d.x)
+  .y(d => d.y)
   //.curve(d3.curveCardinal)
 
 var svg = d3.select("div.output svg")
@@ -831,8 +863,8 @@ var y = d3.scaleLinear()
           .domain([-1, 1]).range([h, 0])
 
 var lineFn = d3.line()
-  .x(function(d) { return x(d.x) })
-  .y(function(d) { return y(d.y) })
+  .x(d => x(d.x))
+  .y(d => y(d.y))
 
 var svg = d3.select("div.output svg")
 

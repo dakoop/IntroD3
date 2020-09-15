@@ -69,9 +69,9 @@
     codeText = codes.append('textarea')
       .attr('class', 'code')
       .property('value', fn_to_string(code))
-      .on('keydown', function() {
+      .on('keydown', function(event) {
           // Run if command + enter
-          if (d3.event.keyCode === 13 && d3.event.metaKey) run();
+          if (d3.keyCode === 13 && d3.metaKey) run();
           d3.event.stopPropagation();
         })
 

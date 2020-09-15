@@ -56,10 +56,10 @@
     .attr('class', 'code')
       .attr('placeholder', 'JavaScript goes in here...')
       .property('value', code)
-      .on('keydown', function() {
+      .on('keydown', function(event) {
           // Run if command + enter
-          if (d3.event.keyCode === 13 && d3.event.metaKey) run();
-          d3.event.stopPropagation();
+          if (event.keyCode === 13 && event.metaKey) run();
+          event.stopPropagation();
         })
 
     var buttonBar = codes.append('div')
