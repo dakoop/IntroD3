@@ -29,7 +29,6 @@
   }
 
   d3.select('body').on('keydown', function(event) {
-    console.log("GOT EVENT:", event, event.code);
     var newSlide;
     switch (event.keyCode) {
       case 40:
@@ -46,7 +45,6 @@
         newSlide = event.shiftKey ? slide - 1 : slide + 1;
         break;
       default:
-        console.log("GOT DEFAULT, RETURNING");
         return;
     }
     update(newSlide);
